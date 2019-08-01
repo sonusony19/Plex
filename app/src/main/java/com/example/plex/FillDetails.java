@@ -12,14 +12,17 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -267,8 +270,8 @@ public class FillDetails extends AppCompatActivity implements FillDetailsNavigat
 
     public void saveBtnClicked(View view) {
         updateUser();
-      /*  startActivity(new Intent(FillDetails.this,MainPage.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-        finish();*/
+        startActivity(new Intent(FillDetails.this,MainPage.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        finish();
     }
 
    @Override
@@ -286,13 +289,28 @@ public class FillDetails extends AppCompatActivity implements FillDetailsNavigat
     }
 
     private void updateUser() {
-        reference = FirebaseDatabase.getInstance().getReference("Users").child(fUser.getUid());
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("imagelink",cloudUri);
-        LatLng loc = LocationClass.getDeviceLocation(FillDetails.this);
-        map.put("lattitude",String.valueOf(loc.latitude));
-        map.put("longitude",String.valueOf(loc.longitude));
-        map.put("userName",username.getText().toString().trim());
-        reference.updateChildren(map);
+        LocationClass.getDeviceLocation(FillDetails.this);
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Saving");
+        progressDialog.show();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Location mLocation = LocationClass.getDeviceLocation(FillDetails.this);
+                if(mLocation==null){
+                    Toast.makeText(getApplicationContext(),"Location nahi mili",Toast.LENGTH_LONG).show();
+                    return;
+                }
+                reference = FirebaseDatabase.getInstance().getReference("Users").child(fUser.getUid());
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("imagelink",cloudUri);
+                map.put("latitude",String.valueOf(mLocation.getLatitude()));
+                map.put("longitude",String.valueOf(mLocation.getLongitude()));
+                map.put("userName",username.getText().toString().trim());
+                reference.updateChildren(map);
+                progressDialog.dismiss();
+            }
+        },5000);
+
     }
 }

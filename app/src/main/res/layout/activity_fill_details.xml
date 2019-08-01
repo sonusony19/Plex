@@ -41,12 +41,12 @@
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginLeft="1dp"
                         android:layout_toRightOf="@id/profile_image"
                         android:backgroundTint="@color/colorPrimaryDark"
                         android:foreground="@drawable/ic_edit_black_24dp"
-                        app:fabSize="mini"
 
-                        />
+                        app:fabSize="mini" />
                 </RelativeLayout>
 
                 <RelativeLayout

@@ -3,39 +3,72 @@ package com.example.plex.util;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.IntentSender;
 import android.location.Location;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.example.plex.AllUsers;
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 public class LocationClass {
 
     private static FusedLocationProviderClient mFusedLocationProviderClient;
-    private static Location mLastKnownLocation;
+    private static Location mLastKnownLocation=null;
+    private GoogleMap map;
+    private static LocationCallback locationCallback;
+
 
     @SuppressLint("MissingPermission")
-    public static LatLng getDeviceLocation(final Context context){
+    public static Location getDeviceLocation( final  Context context) {
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
         mFusedLocationProviderClient.getLastLocation()
-                .addOnCompleteListener(new OnCompleteListener<android.location.Location>() {
+                .addOnCompleteListener(new OnCompleteListener<Location>() {
                     @Override
-                    public void onComplete(@NonNull Task<android.location.Location> task) {
-                        if(task.isSuccessful() && task.getResult()!=null){
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if (task.isSuccessful()) {
                             mLastKnownLocation = task.getResult();
+                            if (mLastKnownLocation == null) {
+                                final LocationRequest locationRequest = LocationRequest.create();
+                                locationRequest.setInterval(10000);
+                                locationRequest.setFastestInterval(5000);
+                                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                                locationCallback = new LocationCallback() {
+                                    @Override
+                                    public void onLocationResult(LocationResult locationResult) {
+                                        super.onLocationResult(locationResult);
+                                        if (locationResult == null) {
+                                            return;
+                                        }
+                                        mLastKnownLocation = locationResult.getLastLocation();
+                                        mFusedLocationProviderClient.removeLocationUpdates(locationCallback);
+                                    }
+                                };
+                                mFusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
+                            }
+                        } else {
+                            Toast.makeText(context, "unable to get last location", Toast.LENGTH_SHORT).show();
                         }
-                        else
-                            Toast.makeText(context,"Some Error Occured",Toast.LENGTH_LONG).show();
                     }
                 });
-        return new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
+        return mLastKnownLocation;
     }
-
-
 }

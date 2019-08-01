@@ -60,4 +60,5 @@ configurations.all {
                 details.useVersion "${targetSdk}.+"
             }
         }
-    }}
+    }
+}
