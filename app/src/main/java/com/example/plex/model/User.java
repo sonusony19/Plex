@@ -8,17 +8,20 @@ public class User {
     private String age;
     private String status;
     private String sex;
-    private String lattitude;
+    private String latitude;
     private String longitude;
 
-    public User(String id, String userName, String imageLink, String age, String status, String sex, String lattitude, String longitude) {
+    public User() {
+    }
+
+    public User(String id, String userName, String imageLink, String age, String status, String sex, String latitude, String longitude) {
         this.id = id;
         this.userName = userName;
         this.imageLink = imageLink;
         this.age = age;
         this.status = status;
         this.sex = sex;
-        this.lattitude = lattitude;
+        this.latitude = latitude;
         this.longitude = longitude;
     }
 
@@ -34,8 +37,8 @@ public class User {
         return userName;
     }
 
-    public void setUserName(String name) {
-        this.userName = name;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getImageLink() {
@@ -70,12 +73,12 @@ public class User {
         this.sex = sex;
     }
 
-    public String getLattitude() {
-        return lattitude;
+    public String getLatitude() {
+        return latitude;
     }
 
-    public void setLattitude(String lattitude) {
-        this.lattitude = lattitude;
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
     }
 
     public String getLongitude() {

@@ -1,31 +1,298 @@
 package com.example.plex;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProviders;
 
+import android.Manifest;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.provider.Settings;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
-public class FillDetails extends AppCompatActivity {
+import com.bumptech.glide.Glide;
+import com.example.plex.constants.IntentRequestCodes;
+import com.example.plex.model.User;
+import com.example.plex.navigators.FillDetailsNavigator;
+import com.example.plex.util.ImportantMethods;
+import com.example.plex.util.LocationClass;
+import com.example.plex.viewModel.FillDetailsViewModel;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.DexterError;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.PermissionRequestErrorListener;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.rengwuxian.materialedittext.MaterialEditText;
+
+import java.util.HashMap;
+import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
+
+public class FillDetails extends AppCompatActivity implements FillDetailsNavigator {
 
     private Toolbar toolbar;
+    private String imageUri,cloudUri;
+    private FillDetailsViewModel viewModel;
+    private boolean flag = false;
+    private MaterialEditText username;
+    private CircleImageView circleImageView;
+    private StorageTask uploadTask;
+    private DatabaseReference reference;
+    private StorageReference storageReference;
+    private FirebaseUser fUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fill_details);
         toolbar = findViewById(R.id.toolbar);
+        username = findViewById(R.id.nametag);
+        circleImageView = findViewById(R.id.profile_image);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Set Your Details");
+        viewModel = ViewModelProviders.of(this).get(FillDetailsViewModel.class);
+        viewModel.setNavigator(this);
+        storageReference = FirebaseStorage.getInstance().getReference("uploads");
+        fUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        reference = FirebaseDatabase.getInstance().getReference("Users").child(fUser.getUid());
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                username.setText(user.getUserName());
+                if(user.getImageLink().equals("default"))
+                {
+                    imageUri = "default";
+                    circleImageView.setImageResource(R.drawable.user_icon);
+                }else
+                {
+                    Glide.with(FillDetails.this).load(user.getImageLink()).into(circleImageView);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void cameraButtonClicked(View view) {
+        requestMultiplePermissions();
+        viewModel.openViewModelCamera();
+
+    }
+
+    public void galaryButtonClicked(View view) {
+        requestMultiplePermissions();
+        viewModel.openViewModelGalary();
+    }
+
+    @Override
+    public void openGalary() {
+        startActivityForResult(Intent.createChooser(new Intent(Intent.ACTION_OPEN_DOCUMENT).setType("image/*"), "Pic an Image"), IntentRequestCodes.PICK_PICTURE_ACTIVITY_REQUEST);
+    }
+
+    @Override
+    public void openCamera() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(intent, IntentRequestCodes.CAPTURE_PICTURE_ACTIVITY_REQUEST);
+        }
+    }
+
+
+    public void uploadImage() {
+        final ProgressDialog progressDialog= new ProgressDialog(FillDetails.this);
+        progressDialog.setMessage("Uploading");
+        progressDialog.show();
+
+        if(imageUri!=null)
+        {
+            final StorageReference fileReference = storageReference.child(System.currentTimeMillis()+"."+ ImportantMethods.getFileExtension(FillDetails.this,Uri.parse(imageUri)));
+            uploadTask = fileReference.putFile(Uri.parse(imageUri));
+            uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if(!task.isSuccessful())
+                    {
+                        throw  task.getException();
+                    }
+                    return fileReference.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if(task.isSuccessful())
+                    {
+                        cloudUri = task.getResult().toString();
+                        progressDialog.dismiss();
+                    }
+                    else
+                    {
+                        Toast.makeText(getApplicationContext(),"Failed",Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
+                }
+            });
+        }
+        else
+        {
+            Toast.makeText(getApplicationContext(),"No image selected",Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    private void requestMultiplePermissions() {
+        Dexter.withActivity(this)
+                .withPermissions(
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.CAMERA)
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        if (report.areAllPermissionsGranted()) {
+                            flag = true;
+                        }
+                        if (report.isAnyPermissionPermanentlyDenied()) {
+                            flag = false;
+                            AlertDialog.Builder builder = new AlertDialog.Builder(FillDetails.this);
+                            builder.setTitle("Permission Denied")
+                                    .setMessage(" Some Permissions are permanently denied. you need to go to setting to allow the permissions.")
+                                    .setNegativeButton("Cancel", null)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Intent intent = new Intent();
+                                            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                            intent.setData(Uri.fromParts("package", getPackageName(), null));
+                                            startActivity(intent);
+                                        }
+                                    })
+                                    .show();
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+                }).
+                withErrorListener(new PermissionRequestErrorListener() {
+                    @Override
+                    public void onError(DexterError error) {
+                        Toast.makeText(getApplicationContext(), "Some Error! ", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .onSameThread()
+                .check();
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode){
+            case IntentRequestCodes.CAPTURE_PICTURE_ACTIVITY_REQUEST:
+                if(resultCode==RESULT_OK)
+                {
+                    Bitmap tempBmp = (Bitmap)data.getExtras().get("data");
+                    imageUri= ImportantMethods.getImageUri(getApplication().getApplicationContext(),tempBmp).toString();
+                    if(uploadTask!=null && uploadTask.isInProgress())
+                    {
+                        Toast.makeText(FillDetails.this,"Upload in Progress",Toast.LENGTH_LONG).show();
+                    }
+                    else uploadImage();
+                }
+                break;
+
+            case IntentRequestCodes.PICK_PICTURE_ACTIVITY_REQUEST:
+                if(resultCode==RESULT_OK)
+                {
+                    Uri tempUri = data.getData();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                        getApplication().getContentResolver().takePersistableUriPermission(tempUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    }
+                    imageUri = tempUri.toString();
+                    if(uploadTask!=null && uploadTask.isInProgress())
+                    {
+                        Toast.makeText(FillDetails.this,"Upload in Progress",Toast.LENGTH_LONG).show();
+                    }
+                    else uploadImage();
+                }
+                break;
+        }
 
     }
 
     public void saveBtnClicked(View view) {
+        updateUser();
+      /*  startActivity(new Intent(FillDetails.this,MainPage.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        finish();*/
     }
 
-    public void cameraButtonClicked(View view) {
+   @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.my_menu,menu);
+        return true;
     }
 
-    public void galaryButtonClicked(View view) {
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        updateUser();
+        startActivity(new Intent(FillDetails.this,MainPage.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        finish();
+        return true;
+    }
+
+    private void updateUser() {
+        reference = FirebaseDatabase.getInstance().getReference("Users").child(fUser.getUid());
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("imagelink",cloudUri);
+        LatLng loc = LocationClass.getDeviceLocation(FillDetails.this);
+        map.put("lattitude",String.valueOf(loc.latitude));
+        map.put("longitude",String.valueOf(loc.longitude));
+        map.put("userName",username.getText().toString().trim());
+        reference.updateChildren(map);
     }
 }

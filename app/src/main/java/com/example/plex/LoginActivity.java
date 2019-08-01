@@ -105,7 +105,7 @@ public class LoginActivity extends AppCompatActivity {
         user = FirebaseAuth.getInstance().getCurrentUser();
         user = auth.getCurrentUser();
         if (user != null) {
-            startActivity(new Intent(LoginActivity.this, MainPage.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            startActivity(new Intent(LoginActivity.this, FillDetails.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             finish();
         }
     }
@@ -117,7 +117,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful())
                 {
-                    Intent intent = new Intent(LoginActivity.this,MainPage.class);
+                    Intent intent = new Intent(LoginActivity.this,FillDetails.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     finish();

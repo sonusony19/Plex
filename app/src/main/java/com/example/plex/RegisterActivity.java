@@ -102,17 +102,18 @@ public class RegisterActivity extends AppCompatActivity {
                     values.put("userName",userData.getString("name"));
                     values.put("age",userData.getString("age"));
                     values.put("sex",userData.getString("sex"));
-                    values.put("imagelink","default");
+                    values.put("imageLink","default");
                     values.put("status","offline");
+                    values.put("latitude","0.00000");
+                    values.put("longitude","0.00000");
 
                     reference.setValue(values).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if(task.isSuccessful())
                             {
-                                auth.getInstance().signOut();
-                                Intent intent =  new Intent(RegisterActivity.this,LoginActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                Intent intent =  new Intent(RegisterActivity.this,FillDetails.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                                 finish();
                             }
