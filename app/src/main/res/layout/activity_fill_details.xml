@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FillDetails">
+
+    <include layout="@layout/bar_layout"
+        android:id="@+id/toolbar"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar"
+        android:padding="20dp">
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:cardCornerRadius="20dp"
+            android:outlineSpotShadowColor="@color/semi_gray">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <RelativeLayout
+                    android:layout_marginTop="50dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/layout1">
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_centerHorizontal="true"
+                        android:src="@drawable/user_icon"
+                        android:id="@+id/profile_image"/>
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/colorPrimaryDark"
+                        android:foreground="@drawable/ic_edit_black_24dp"
+                        android:layout_toRightOf="@id/profile_image"
+
+                         />
+                </RelativeLayout>
+               <RelativeLayout
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:layout_marginTop="30dp"
+                   android:gravity="center_horizontal"
+                   android:id="@+id/layout2"
+                   android:layout_below="@id/layout1">
+                   <Button
+                       android:id="@+id/btn_galary"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:background="@drawable/background2"
+                       android:backgroundTint="@color/colorPrimaryDark"
+                       android:text="Galary"
+                       android:textAllCaps="false"
+                       android:textColor="@color/white"
+                       android:layout_margin="10dp"
+                       android:textSize="20dp"
+                       android:onClick="galaryButtonClicked"
+                       android:textStyle="bold" />
+                   <Button
+                       android:id="@+id/btn_camera"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:background="@drawable/background2"
+                       android:layout_toRightOf="@id/btn_galary"
+                       android:onClick="cameraButtonClicked"
+                       android:backgroundTint="@color/colorPrimaryDark"
+                       android:text="Camera"
+                       android:layout_margin="10dp"
+                       android:textAllCaps="false"
+                       android:textColor="@color/white"
+                       android:textSize="20dp"
+                       android:textStyle="bold" />
+
+               </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="30dp"
+                    android:id="@+id/layout3"
+                    android:layout_below="@id/layout2">
+
+                    <com.rengwuxian.materialedittext.MaterialEditText
+                        android:id="@+id/nametag"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:hint=" Enter your name"
+                        app:met_floatingLabel="normal" />
+
+                </RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:gravity="center_horizontal"
+                    android:layout_alignParentBottom="true">
+                    <Button
+                        android:id="@+id/savebtn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background2"
+                        android:backgroundTint="@color/colorPrimaryDark"
+                        android:text="Save"
+                        android:onClick="saveBtnClicked"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:layout_margin="10dp"
+                        android:textSize="20dp"
+                        android:textStyle="bold" />
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+        </androidx.cardview.widget.CardView>
+    </RelativeLayout>
+
+</RelativeLayout>

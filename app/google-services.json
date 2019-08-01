@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "604418163598",
+    "firebase_url": "https://plex-31d74.firebaseio.com",
+    "project_id": "plex-31d74",
+    "storage_bucket": "plex-31d74.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:604418163598:android:910e40226ed650d5",
+        "android_client_info": {
+          "package_name": "com.example.plex"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "604418163598-n19fq6ijvh35cgp9t08ojrmngta12qeu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.plex",
+            "certificate_hash": "68000b14161306fc872e8d85a9e9ed675d12f2b1"
+          }
+        },
+        {
+          "client_id": "604418163598-b5qne6atmg87vjja7j3gag9v414dq0k1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9OVej-hgFW5sAbvqJawZssaFrMfKEH2s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "604418163598-b5qne6atmg87vjja7j3gag9v414dq0k1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
