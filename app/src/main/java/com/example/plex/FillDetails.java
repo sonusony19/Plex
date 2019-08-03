@@ -241,12 +241,15 @@ public class FillDetails extends AppCompatActivity implements FillDetailsNavigat
                 if(resultCode==RESULT_OK)
                 {
                     Bitmap tempBmp = (Bitmap)data.getExtras().get("data");
+                    circleImageView.setImageBitmap(tempBmp);
                     imageUri= ImportantMethods.getImageUri(getApplication().getApplicationContext(),tempBmp).toString();
                     if(uploadTask!=null && uploadTask.isInProgress())
                     {
                         Toast.makeText(FillDetails.this,"Upload in Progress",Toast.LENGTH_LONG).show();
                     }
-                    else uploadImage();
+                    else {
+                        uploadImage();
+                    }
                 }
                 break;
 
@@ -254,6 +257,7 @@ public class FillDetails extends AppCompatActivity implements FillDetailsNavigat
                 if(resultCode==RESULT_OK)
                 {
                     Uri tempUri = data.getData();
+                    circleImageView.setImageURI(tempUri);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                         getApplication().getContentResolver().takePersistableUriPermission(tempUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                     }
@@ -298,11 +302,7 @@ public class FillDetails extends AppCompatActivity implements FillDetailsNavigat
             @Override
             public void run() {
                 Location mLocation = LocationClass.getDeviceLocation(FillDetails.this);
-                if(mLocation==null){
-                    Toast.makeText(getApplicationContext(),"Location nahi mili",Toast.LENGTH_LONG).show();
-                    return;
-                }
-                reference = FirebaseDatabase.getInstance().getReference("Users").child(fUser.getUid());
+                               reference = FirebaseDatabase.getInstance().getReference("Users").child(fUser.getUid());
                 HashMap<String, Object> map = new HashMap<>();
                 map.put("imagelink",cloudUri);
                 map.put("latitude",String.valueOf(mLocation.getLatitude()));

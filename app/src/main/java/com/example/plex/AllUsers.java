@@ -7,12 +7,14 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -52,6 +54,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,7 +71,7 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback {
     private SupportMapFragment mapFragment;
     private Location mLastKnownLocation;
     private LocationCallback locationCallback;
-    private int radius=5;
+    private float defaultRadius,chosenRadius=-1;
     private List<User> mUsers = readUsers();
     private Dialog dialog;
     private DatabaseReference reference;
@@ -85,6 +88,16 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback {
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.users);
         mapFragment.getMapAsync(this);
         readUsers();
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(dialog!=null && dialog.isShowing()) dialog.dismiss();
+                startActivity(new Intent(AllUsers.this,MainPage.class));
+                finish();
+
+            }
+        });
     }
 
     @SuppressLint("MissingPermission")
@@ -97,47 +110,56 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback {
        new Handler().postDelayed(new Runnable() {
            @Override
            public void run() {
-               Location tempLocation = LocationClass.getDeviceLocation(AllUsers.this);
-               map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(tempLocation.getLatitude(),tempLocation.getLongitude()), DEFAULT_ZOOM));
+               Location myLocation = LocationClass.getDeviceLocation(AllUsers.this);
+               map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(myLocation.getLatitude(),myLocation.getLongitude()), DEFAULT_ZOOM));
+               for(User user:mUsers){
+                   LatLng userPosition = new LatLng(Double.parseDouble(user.getLatitude()),Double.parseDouble(user.getLongitude()));
+                   Location otherUser = new Location("OtherUser");
+                   otherUser.setLatitude(Double.parseDouble(user.getLatitude()));
+                   otherUser.setLongitude(Double.parseDouble(user.getLongitude()));
+                   float distance = myLocation.distanceTo(otherUser)/1000;
+                   if(chosenRadius==-1) defaultRadius=5;
+                   else defaultRadius = chosenRadius;
+                   if(distance<=defaultRadius){
+                       map.addMarker(new MarkerOptions().position(userPosition).title(user.getUserName()).snippet("Click here to know more")).setTag(user);
+                   }
+               //map.moveCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 10F));
+               }
            }
        },4000);
 
-        for(User user:mUsers){
-
-            LatLng userPosition = new LatLng(Double.parseDouble(user.getLatitude()),Double.parseDouble(user.getLongitude()));
-            map.addMarker(new MarkerOptions().position(userPosition).title(user.getUserName()).snippet("Click here to know more")).setTag(user);
-            //map.moveCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 10F));
-        }
 
 
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(5000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
-        SettingsClient settingsClient = LocationServices.getSettingsClient(AllUsers.this);
-        Task<LocationSettingsResponse> task = settingsClient.checkLocationSettings(builder.build());
+       /* LocationRequest locationRequest = LocationRequest.create();
 
-        task.addOnSuccessListener(AllUsers.this, new OnSuccessListener<LocationSettingsResponse>() {
-            @Override
-            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                getDeviceLocation();
-            }
-        });
+          locationRequest.setInterval(10000);
+          locationRequest.setFastestInterval(5000);
+          locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+          LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+          SettingsClient settingsClient = LocationServices.getSettingsClient(AllUsers.this);
+          Task<LocationSettingsResponse> task = settingsClient.checkLocationSettings(builder.build());
 
-        task.addOnFailureListener(AllUsers.this, new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                if (e instanceof ResolvableApiException) {
-                    ResolvableApiException resolvable = (ResolvableApiException) e;
-                    try {
-                        resolvable.startResolutionForResult(AllUsers.this, 51);
-                    } catch (IntentSender.SendIntentException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-            }
-        });
+          task.addOnSuccessListener(AllUsers.this, new OnSuccessListener<LocationSettingsResponse>() {
+              @Override
+              public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                  getDeviceLocation();
+              }
+          });
+
+          task.addOnFailureListener(AllUsers.this, new OnFailureListener() {
+              @Override
+              public void onFailure(@NonNull Exception e) {
+                  if (e instanceof ResolvableApiException) {
+                      ResolvableApiException resolvable = (ResolvableApiException) e;
+                      try {
+                          resolvable.startResolutionForResult(AllUsers.this, 51);
+                      } catch (IntentSender.SendIntentException e1) {
+                          e1.printStackTrace();
+                      }
+                  }
+              }
+          });
+      */
 
         map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
@@ -211,7 +233,7 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback {
                 mUsers.clear();
                 for(DataSnapshot snapshot: dataSnapshot.getChildren())
                 {
-                    User user = snapshot.getValue(User.class);
+                 User user = snapshot.getValue(User.class);
                     assert user!=null;
                     assert firebaseUser!=null;
                     if(!user.getId().equals(firebaseUser.getUid()))
@@ -235,10 +257,7 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        return super.onOptionsItemSelected(item);
-    }
+
 
     private void showAlertDialogue(final User user) {
 
@@ -295,15 +314,32 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback {
         status("offline");
     }
 
-    @Override
-    protected void onDestroy() {
-        if(dialog.isShowing())dialog.dismiss();
-        super.onDestroy();
-    }
 
     @Override
-    public void onBackPressed() {
-        if(dialog.isShowing())dialog.dismiss();
-        super.onBackPressed();
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        dialog = new Dialog(this);
+        View view = getLayoutInflater().inflate(R.layout.chooseradius_layout,null);
+        dialog.setContentView(view);
+        dialog.setCancelable(false);
+        dialog.show();
+        Button cancel,save;
+        final MaterialEditText tempRadius;
+        cancel = view.findViewById(R.id.btn_cancel);
+        save = view.findViewById(R.id.btn_save);
+        tempRadius = view.findViewById(R.id.radius);
+        cancel.setOnClickListener(new View.OnClickListener() {@Override public void onClick(View view) { dialog.dismiss(); }});
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!TextUtils.isEmpty(tempRadius.getText().toString())){
+                    chosenRadius= Float.parseFloat(tempRadius.getText().toString());
+                }
+                dialog.dismiss();
+                onMapReady(map);
+            }
+        });
+        return true;
+
     }
+
 }

@@ -66,7 +66,7 @@ public class MessageActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MessageActivity.this,AllUsers.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                startActivity(new Intent(MessageActivity.this,MainPage.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
         });
         recyclerView.setHasFixedSize(true);
@@ -75,17 +75,17 @@ public class MessageActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(linearLayoutManager);
 
 
-        intent = getIntent();
+      /*  intent = getIntent();
         userid = intent.getStringExtra("userid");
-
-        username.setOnClickListener(new View.OnClickListener() {
+*/
+      /*  username.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MessageActivity.this,ProfileActivity.class);
                 intent.putExtra("user",userid);
                 startActivity(intent);
             }
-        });
+        });*/
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         reference = FirebaseDatabase.getInstance().getReference("Users").child(userid);

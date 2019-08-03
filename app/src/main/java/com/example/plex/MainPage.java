@@ -49,7 +49,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MainPage extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainPage extends AppCompatActivity {
 
     private UserAdapter adapter;
     private RecyclerView recyclerView;
@@ -57,27 +57,48 @@ public class MainPage extends AppCompatActivity implements NavigationView.OnNavi
     private List<String> userlist;
     FirebaseUser firebaseUser;
     DatabaseReference reference;
-    private CircleImageView userImage;
-    private TextView name,email;
-
+    private CircleImageView imageView;
+    private TextView userName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_page);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        View view = LayoutInflater.from(this).inflate(R.layout.nav_header_main_page,null,false);
-        userImage = view.findViewById(R.id.userImageNavBar);
-        name = view.findViewById(R.id.userNameNavBar);
-        email = view.findViewById(R.id.userEmailNavBar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Plex");
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        getSupportActionBar().setTitle("");
+        userName = findViewById(R.id.usernametag);
+        imageView = findViewById(R.id.profile_image);
+      /*  DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setNavigationItemSelectedListener(this);*/
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        reference= FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user = (User)dataSnapshot.getValue(User.class);
+                userName.setText(user.getUserName());
+                if(user.getImageLink().equals("default"))
+                {
+                    imageView.setImageResource(R.drawable.user_icon);
+                }else
+                {
+                        Glide.with(getApplicationContext()).load(user.getImageLink()).into(imageView);
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         recyclerView = findViewById(R.id.recycler_view);
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -111,7 +132,7 @@ public class MainPage extends AppCompatActivity implements NavigationView.OnNavi
       //  inflateNavigtionDrawerHeader();
     }
 
-    private void inflateNavigtionDrawerHeader() {
+   /* private void inflateNavigtionDrawerHeader() {
 
         DatabaseReference tempRef = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
         tempRef.addValueEventListener(new ValueEventListener() {
@@ -138,7 +159,7 @@ public class MainPage extends AppCompatActivity implements NavigationView.OnNavi
 
             }
         });
-    }
+    }*/
 
     private void readChats() {
 
@@ -169,7 +190,7 @@ public class MainPage extends AppCompatActivity implements NavigationView.OnNavi
     }
 
 
-    @Override
+    /*@Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -177,11 +198,33 @@ public class MainPage extends AppCompatActivity implements NavigationView.OnNavi
         } else {
             super.onBackPressed();
         }
+    }*/
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.mainpage_menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.profilemenu:
+                startActivity(new Intent(this,ProfileActivity.class));
+                break;
+            case R.id.logoutmenu:
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(this,LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                finish();
+                break;
+        }
+        return true;
     }
 
     public void showAllUsers(View view) {
         startActivity(new Intent(this,AllUsers.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
+/*
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -201,6 +244,7 @@ public class MainPage extends AppCompatActivity implements NavigationView.OnNavi
         }
         return true;
     }
+*/
 
 
     private void status(String status){

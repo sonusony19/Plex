@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MessageActivity"
-            android:parentActivityName=".AllUsers"></activity>
+            android:parentActivityName=".MainPage"></activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -29,7 +29,7 @@
         <activity
             android:name=".MainPage"
             android:label="@string/title_activity_main_page"
-            android:theme="@style/AppTheme.NoActionBar" />
+             />
         <activity
             android:name=".ProfileActivity"
             android:parentActivityName=".MainPage" />

@@ -44,7 +44,7 @@
                         android:layout_marginLeft="1dp"
                         android:layout_toRightOf="@id/profile_image"
                         android:backgroundTint="@color/colorPrimaryDark"
-                        android:foreground="@drawable/ic_edit_black_24dp"
+                        android:foreground="@drawable/edit_icon"
 
                         app:fabSize="mini" />
                 </RelativeLayout>
