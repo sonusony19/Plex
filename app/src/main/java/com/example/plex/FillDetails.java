@@ -73,6 +73,7 @@ public class FillDetails extends AppCompatActivity implements FillDetailsNavigat
     private StorageTask uploadTask;
     private DatabaseReference reference;
     private StorageReference storageReference;
+    private ProgressDialog dialog;
     private FirebaseUser fUser;
 
     @Override
@@ -290,9 +291,9 @@ public class FillDetails extends AppCompatActivity implements FillDetailsNavigat
 
     private void updateUser() {
         LocationClass.getDeviceLocation(FillDetails.this);
-        final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Saving");
-        progressDialog.show();
+        dialog = new ProgressDialog(this);
+        dialog.setMessage("Saving");
+        dialog.show();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -308,9 +309,18 @@ public class FillDetails extends AppCompatActivity implements FillDetailsNavigat
                 map.put("longitude",String.valueOf(mLocation.getLongitude()));
                 map.put("userName",username.getText().toString().trim());
                 reference.updateChildren(map);
-                progressDialog.dismiss();
+                dialog.dismiss();
             }
-        },5000);
+        },4000);
 
     }
+
+    @Override
+    protected void onDestroy() {
+        if(dialog.isShowing()){
+            dialog.dismiss();
+        }
+        super.onDestroy();
+    }
 }
+

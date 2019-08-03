@@ -1,17 +1,28 @@
 package com.example.plex;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.plex.model.User;
 import com.example.plex.util.LocationClass;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -28,6 +39,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -42,18 +54,24 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class AllUsers extends AppCompatActivity implements OnMapReadyCallback {
 
     private Toolbar toolbar;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private GoogleMap map;
-    private final int DEFAULT_ZOOM=10;
+    private final int DEFAULT_ZOOM=1;
     private SupportMapFragment mapFragment;
     private Location mLastKnownLocation;
     private LocationCallback locationCallback;
-    private List<User> mUsers = new ArrayList<>();
+    private int radius=5;
+    private List<User> mUsers = readUsers();
+    private Dialog dialog;
+    private DatabaseReference reference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,11 +100,12 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback {
                Location tempLocation = LocationClass.getDeviceLocation(AllUsers.this);
                map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(tempLocation.getLatitude(),tempLocation.getLongitude()), DEFAULT_ZOOM));
            }
-       },2000);
+       },4000);
 
         for(User user:mUsers){
+
             LatLng userPosition = new LatLng(Double.parseDouble(user.getLatitude()),Double.parseDouble(user.getLongitude()));
-            map.addMarker(new MarkerOptions().position(userPosition).title(user.getUserName()));
+            map.addMarker(new MarkerOptions().position(userPosition).title(user.getUserName()).snippet("Click here to know more")).setTag(user);
             //map.moveCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 10F));
         }
 
@@ -120,7 +139,15 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback {
             }
         });
 
+        map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker){
+                User user = (User) marker.getTag();
+                showAlertDialogue(user);
+            }
+        });
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -173,9 +200,10 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback {
 
 
 
-    private void readUsers() {
+    private List<User> readUsers() {
         final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         final DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
+        List<User> tempUserList = new ArrayList<>();
 
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -198,5 +226,84 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback {
 
             }
         });
+        return tempUserList;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.choose_radius,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showAlertDialogue(final User user) {
+
+         dialog= new Dialog(this);
+         View view =getLayoutInflater().inflate(R.layout.infowindow_layout,null);
+         dialog.setContentView(view);
+         dialog.show();
+         Button cancel,chat,meet;
+         CircleImageView userImage;
+         TextView userName,userAge;
+         cancel = view.findViewById(R.id.btn_cancel);
+         chat = view.findViewById(R.id.btn_chat);
+         meet = view.findViewById(R.id.btn_meet);
+         userImage = view.findViewById(R.id.profile_image);
+         userAge = view.findViewById(R.id.userAgeInfoWIndow);
+         userName = view.findViewById(R.id.userNameInfoWIndow);
+
+
+        userName.setText(userName.getText().toString()+user.getUserName());
+        userAge.setText(userAge.getText().toString()+user.getAge());
+        if(user.getImageLink().equals("default"))
+        {
+            userImage.setImageResource(R.drawable.user_icon);
+        }else
+        {
+            Glide.with(getApplicationContext()).load(user.getImageLink()).into(userImage);
+        }
+
+        cancel.setOnClickListener(new View.OnClickListener() {@Override public void onClick(View view) { dialog.dismiss(); }});
+        meet.setOnClickListener(new View.OnClickListener() {@Override public void onClick(View view) { }});
+        chat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(AllUsers.this,MessageActivity.class).putExtra("userid",user.getId())); }});
+    }
+
+    private void status(String status){
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status",status);
+        reference.updateChildren(hashMap);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        status("online");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        status("offline");
+    }
+
+    @Override
+    protected void onDestroy() {
+        if(dialog.isShowing())dialog.dismiss();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(dialog.isShowing())dialog.dismiss();
+        super.onBackPressed();
     }
 }

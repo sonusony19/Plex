@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 
+import com.bumptech.glide.Glide;
 import com.example.plex.model.Chat;
 import com.example.plex.model.User;
 import com.example.plex.util.LocationClass;
@@ -13,6 +14,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import android.os.Handler;
+import android.view.LayoutInflater;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -38,11 +40,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.Menu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainPage extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -52,12 +57,19 @@ public class MainPage extends AppCompatActivity implements NavigationView.OnNavi
     private List<String> userlist;
     FirebaseUser firebaseUser;
     DatabaseReference reference;
+    private CircleImageView userImage;
+    private TextView name,email;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_page);
         Toolbar toolbar = findViewById(R.id.toolbar);
+        View view = LayoutInflater.from(this).inflate(R.layout.nav_header_main_page,null,false);
+        userImage = view.findViewById(R.id.userImageNavBar);
+        name = view.findViewById(R.id.userNameNavBar);
+        email = view.findViewById(R.id.userEmailNavBar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Plex");
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -94,6 +106,37 @@ public class MainPage extends AppCompatActivity implements NavigationView.OnNavi
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) { }
+        });
+
+      //  inflateNavigtionDrawerHeader();
+    }
+
+    private void inflateNavigtionDrawerHeader() {
+
+        DatabaseReference tempRef = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+        tempRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+               if(user==null){
+                   Toast.makeText(getApplicationContext(),"user not found",Toast.LENGTH_LONG).show();
+               }
+                name.setText(user.getUserName());
+                email.setText(firebaseUser.getEmail());
+                if(user.getImageLink().equals("default"))
+                {
+
+                    userImage.setImageResource(R.drawable.user_icon);
+                }else
+                {
+                    Glide.with(MainPage.this).load(user.getImageLink()).into(userImage);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
         });
     }
 
@@ -148,7 +191,7 @@ public class MainPage extends AppCompatActivity implements NavigationView.OnNavi
 
         switch (item.getItemId()){
             case R.id.profilemenu:
-                startActivity(new Intent(this,ProfileActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                startActivity(new Intent(this,ProfileActivity.class));
                 break;
             case R.id.logoutmenu:
                 FirebaseAuth.getInstance().signOut();
@@ -181,7 +224,7 @@ public class MainPage extends AppCompatActivity implements NavigationView.OnNavi
 
     @Override
     public boolean isDestroyed() {
-        status("offline");
         return super.isDestroyed();
     }
+
 }

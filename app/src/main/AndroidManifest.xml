@@ -16,7 +16,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MessageActivity"></activity>
+        <activity android:name=".MessageActivity"
+            android:parentActivityName=".AllUsers"></activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -35,6 +36,7 @@
         <activity
             android:name=".RegisterActivity"
             android:parentActivityName=".LoginActivity" />
+
         <activity android:name=".ResetPasswordActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".SplashActivity">

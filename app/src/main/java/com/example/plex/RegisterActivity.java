@@ -139,7 +139,9 @@ public class RegisterActivity extends AppCompatActivity {
         String scpass = cPassword.getText().toString().trim();
         if(TextUtils.isEmpty(semail)) { state=false; email.setError("Required");}
         if(TextUtils.isEmpty(sage)) { state=false; age.setError("Required");}
-        if(Integer.parseInt(sage)<15){ state = false; age.setError("Age should be more than 15");}
+        else{
+            if( Integer.parseInt(sage)<15){ state = false; age.setError("Age should be more than 15");}
+        }
         if(TextUtils.isEmpty(sname)) { state=false; name.setError("Required");}
         if(TextUtils.isEmpty(spass)) { state=false; password.setError("Required");}
         if(TextUtils.isEmpty(scpass)) { state=false; cPassword.setError("Required");}
