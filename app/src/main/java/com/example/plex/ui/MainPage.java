@@ -1,29 +1,20 @@
-package com.example.plex;
+package com.example.plex.ui;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 
 import com.bumptech.glide.Glide;
+import com.example.plex.R;
 import com.example.plex.model.Chat;
 import com.example.plex.model.User;
-import com.example.plex.util.LocationClass;
 import com.example.plex.view.UserAdapter;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
-import android.os.Handler;
-import android.view.LayoutInflater;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.core.view.GravityCompat;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 
 import android.view.MenuItem;
 
-import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -32,8 +23,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import androidx.drawerlayout.widget.DrawerLayout;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -41,7 +30,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.Menu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -210,11 +198,11 @@ public class MainPage extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.profilemenu:
-                startActivity(new Intent(this,ProfileActivity.class));
+                startActivity(new Intent(this, ProfileActivity.class));
                 break;
             case R.id.logoutmenu:
                 FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(this,LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                startActivity(new Intent(this, LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
                 finish();
                 break;
         }
@@ -222,7 +210,7 @@ public class MainPage extends AppCompatActivity {
     }
 
     public void showAllUsers(View view) {
-        startActivity(new Intent(this,AllUsers.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        startActivity(new Intent(this, AllUsers.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 /*
 
@@ -268,7 +256,14 @@ public class MainPage extends AppCompatActivity {
 
     @Override
     public boolean isDestroyed() {
+        status("offline");
         return super.isDestroyed();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        finish();
+    }
 }

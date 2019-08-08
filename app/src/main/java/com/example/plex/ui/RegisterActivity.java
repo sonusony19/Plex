@@ -1,4 +1,4 @@
-package com.example.plex;
+package com.example.plex.ui;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.plex.R;
 import com.github.silvestrpredko.dotprogressbar.DotProgressBar;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -34,8 +35,19 @@ public class RegisterActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private DotProgressBar progressBar;
     private Button registerbutton;
-    private Spinner spinner;
+    private Spinner spinner,gameSpinner;
     private ArrayList<String> spinnerContent = getSpinnerContent();
+    private ArrayList<String> gameContent = getGameContent();
+
+    private ArrayList<String> getGameContent() {
+        ArrayList<String> tempList = new ArrayList<>();
+        tempList.add("Soccer");
+        tempList.add("Badminton");
+        tempList.add("Swimming");
+        tempList.add("Eight Ball Pool");
+        tempList.add("Bowling");
+        return tempList;
+    }
 
     private ArrayList<String> getSpinnerContent() {
         ArrayList<String> tempList = new ArrayList<>();
@@ -55,6 +67,7 @@ public class RegisterActivity extends AppCompatActivity {
         cPassword = findViewById(R.id.cpasswordtag);
         age = findViewById(R.id.agetag);
         spinner = findViewById(R.id.spinnertag);
+        gameSpinner = findViewById(R.id.gamespinnertag);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,spinnerContent);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
@@ -79,6 +92,7 @@ public class RegisterActivity extends AppCompatActivity {
             userData.putString("age",age.getText().toString().trim());
             userData.putString("sex",spinner.getSelectedItem().toString());
             userData.putString("pass",password.getText().toString().trim());
+            userData.putString("game",gameSpinner.getSelectedItem().toString());
             registerUser(userData);
         }
     }
@@ -112,7 +126,7 @@ public class RegisterActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<Void> task) {
                             if(task.isSuccessful())
                             {
-                                Intent intent =  new Intent(RegisterActivity.this,FillDetails.class);
+                                Intent intent =  new Intent(RegisterActivity.this, FillDetails.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                                 finish();

@@ -1,4 +1,4 @@
-package com.example.plex;
+package com.example.plex.ui;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.plex.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -47,7 +48,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
                     if(task.isSuccessful())
                     {
                         Toast.makeText(ResetPasswordActivity.this,"Please check your email",Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(ResetPasswordActivity.this,LoginActivity.class));
+                        startActivity(new Intent(ResetPasswordActivity.this, LoginActivity.class));
                     }
                     else{
 

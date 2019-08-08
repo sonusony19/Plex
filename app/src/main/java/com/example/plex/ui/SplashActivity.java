@@ -1,10 +1,12 @@
-package com.example.plex;
+package com.example.plex.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+
+import com.example.plex.R;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -16,7 +18,7 @@ public class SplashActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(SplashActivity.this,StartActivity.class));
+                startActivity(new Intent(SplashActivity.this, StartActivity.class));
                 finish();
             }
         },800);

@@ -1,4 +1,4 @@
-package com.example.plex;
+package com.example.plex.ui;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.plex.R;
 import com.example.plex.model.Chat;
 import com.example.plex.model.User;
 import com.example.plex.view.MessageAdapter;
@@ -66,7 +67,7 @@ public class MessageActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MessageActivity.this,MainPage.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                startActivity(new Intent(MessageActivity.this, MainPage.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
         });
         recyclerView.setHasFixedSize(true);
@@ -75,9 +76,8 @@ public class MessageActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(linearLayoutManager);
 
 
-      /*  intent = getIntent();
+        intent = getIntent();
         userid = intent.getStringExtra("userid");
-*/
       /*  username.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

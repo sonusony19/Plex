@@ -1,4 +1,4 @@
-package com.example.plex;
+package com.example.plex.ui;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Toast;
 
+import com.example.plex.R;
 import com.github.silvestrpredko.dotprogressbar.DotProgressBar;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -53,11 +54,11 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void forgotPasswordClicked(View view) {
-        startActivity(new Intent(LoginActivity.this,ResetPasswordActivity.class));
+        startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
     }
 
     public void methodRegisterActivity(View view) {
-        startActivity(new Intent(LoginActivity.this,RegisterActivity.class));
+        startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
 
     }
 

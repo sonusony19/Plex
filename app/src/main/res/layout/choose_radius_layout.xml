@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:background="@color/black"
+    android:padding="5dp"
+    android:layout_height="wrap_content">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="In KMs"
+        android:textStyle="bold"
+        android:layout_marginRight="5dp"
+        android:textColor="@color/white"
+        />
+       <com.xw.repo.BubbleSeekBar
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           app:bsb_bubble_color="@color/black"
+           app:bsb_bubble_text_color="@color/white"
+           app:bsb_second_track_color="@color/white"
+           app:bsb_max="50"
+           app:bsb_min="1"
+           android:id="@+id/chooseRadiusSeekBar"
+           app:bsb_section_text_position="bottom_sides"
+           app:bsb_always_show_bubble="true"
+           app:bsb_show_progress_in_float="true"
+           app:bsb_track_color="@color/white"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:fabSize="mini"
+        android:id="@+id/dismissPopup"
+        android:layout_marginLeft="10dp"
+        android:src="@drawable/ic_check_black_24dp"
+        android:backgroundTint="@color/white"/>
+
+
+</LinearLayout>

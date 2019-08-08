@@ -1,4 +1,4 @@
-package com.example.plex;
+package com.example.plex.ui;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,17 +22,16 @@ import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.plex.R;
 import com.example.plex.constants.IntentRequestCodes;
 import com.example.plex.model.User;
 import com.example.plex.navigators.FillDetailsNavigator;
 import com.example.plex.util.ImportantMethods;
 import com.example.plex.util.LocationClass;
 import com.example.plex.viewModel.FillDetailsViewModel;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -275,7 +274,7 @@ public class FillDetails extends AppCompatActivity implements FillDetailsNavigat
 
     public void saveBtnClicked(View view) {
         updateUser();
-        startActivity(new Intent(FillDetails.this,MainPage.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        startActivity(new Intent(FillDetails.this, MainPage.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         finish();
     }
 
@@ -304,7 +303,7 @@ public class FillDetails extends AppCompatActivity implements FillDetailsNavigat
                 Location mLocation = LocationClass.getDeviceLocation(FillDetails.this);
                                reference = FirebaseDatabase.getInstance().getReference("Users").child(fUser.getUid());
                 HashMap<String, Object> map = new HashMap<>();
-                map.put("imagelink",cloudUri);
+                map.put("imageLink",cloudUri);
                 map.put("latitude",String.valueOf(mLocation.getLatitude()));
                 map.put("longitude",String.valueOf(mLocation.getLongitude()));
                 map.put("userName",username.getText().toString().trim());

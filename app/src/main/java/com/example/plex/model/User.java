@@ -10,11 +10,12 @@ public class User {
     private String sex;
     private String latitude;
     private String longitude;
+    private String game;
 
     public User() {
     }
 
-    public User(String id, String userName, String imageLink, String age, String status, String sex, String latitude, String longitude) {
+    public User(String id, String userName, String imageLink, String age, String status, String sex, String latitude, String longitude,String game) {
         this.id = id;
         this.userName = userName;
         this.imageLink = imageLink;
@@ -23,6 +24,7 @@ public class User {
         this.sex = sex;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.game = game;
     }
 
     public String getId() {
@@ -87,5 +89,13 @@ public class User {
 
     public void setLongitude(String longitude) {
         this.longitude = longitude;
+    }
+
+    public String getGame() {
+        return game;
+    }
+
+    public void setGame(String game) {
+        this.game = game;
     }
 }

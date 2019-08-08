@@ -1,4 +1,4 @@
-package com.example.plex;
+package com.example.plex.ui;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.plex.R;
 import com.example.plex.constants.IntentRequestCodes;
 import com.example.plex.model.User;
 import com.example.plex.navigators.FillDetailsNavigator;
@@ -54,7 +55,6 @@ import com.karumi.dexter.listener.DexterError;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.PermissionRequestErrorListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-import com.rengwuxian.materialedittext.MaterialEditText;
 
 import java.util.HashMap;
 import java.util.List;
@@ -67,7 +67,7 @@ public class ProfileActivity extends AppCompatActivity implements FillDetailsNav
     private String imageUri,cloudUri;
     private FillDetailsViewModel viewModel;
     private boolean flag = false;
-    private TextView name,email,age;
+    private TextView name,email,age,game;
     private CircleImageView circleImageView;
     private StorageTask uploadTask;
     private DatabaseReference reference;
@@ -84,6 +84,7 @@ public class ProfileActivity extends AppCompatActivity implements FillDetailsNav
         name = findViewById(R.id.username);
         age = findViewById(R.id.Age);
         email = findViewById(R.id.useremail);
+        game = findViewById(R.id.game);
         circleImageView = findViewById(R.id.profile_image);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Profile");
@@ -104,6 +105,7 @@ public class ProfileActivity extends AppCompatActivity implements FillDetailsNav
                 name.setText(name.getText().toString()+user.getUserName());
                 age.setText(age.getText().toString()+user.getAge());
                 email.setText(fUser.getEmail());
+                game.setText(game.getText().toString()+user.getGame());
                 if(user.getImageLink().equals("default"))
                 {
                     imageUri = "default";
@@ -283,7 +285,7 @@ public class ProfileActivity extends AppCompatActivity implements FillDetailsNav
 
     public void saveBtnClicked(View view) {
         updateUser();
-        startActivity(new Intent(ProfileActivity.this,MainPage.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
+        startActivity(new Intent(ProfileActivity.this, MainPage.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
         finish();
     }
 
@@ -312,7 +314,7 @@ public class ProfileActivity extends AppCompatActivity implements FillDetailsNav
                 Location mLocation = LocationClass.getDeviceLocation(ProfileActivity.this);
                 reference = FirebaseDatabase.getInstance().getReference("Users").child(fUser.getUid());
                 HashMap<String, Object> map = new HashMap<>();
-                map.put("imagelink",cloudUri);
+                map.put("imageLink",cloudUri);
                 map.put("latitude",String.valueOf(mLocation.getLatitude()));
                 map.put("longitude",String.valueOf(mLocation.getLongitude()));
                 reference.updateChildren(map);

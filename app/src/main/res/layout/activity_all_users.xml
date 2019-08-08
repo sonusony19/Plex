@@ -3,15 +3,91 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:backgroundTint="@color/white"
     android:layout_height="match_parent"
-    tools:context=".AllUsers">
+    tools:context=".ui.AllUsers">
     <include layout="@layout/bar_layout"
         android:id="@+id/toolbar"/>
-    <fragment
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/toolbar"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:id="@+id/users" />
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="8dp"
+        android:padding="2dp"
+        android:background="@drawable/popup_sports_background"
+        android:gravity="right"
+        >
+        <com.polyak.iconswitch.IconSwitch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:id="@+id/actionSwitch"
+            app:isw_default_selection="right"
+            app:isw_thumb_color_left="@color/black"
+            app:isw_thumb_color_right="@color/white"
+            app:isw_background_color="@color/white"
+            app:isw_active_tint_icon_right="@color/black"
+            app:isw_active_tint_icon_left="@color/white"
+            app:isw_inactive_tint_icon_left="@color/black"
+            app:isw_inactive_tint_icon_right="@color/black"
+            app:isw_icon_left="@drawable/ic_person_pin_circle_black_24dp"
+            app:isw_icon_right="@drawable/ic_tag_faces_black_24dp"
+
+            >
+
+        </com.polyak.iconswitch.IconSwitch>
+    </RelativeLayout>
+
+
+   <RelativeLayout
+       android:layout_below="@id/toolbar"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent">
+       <fragment
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:name="com.google.android.gms.maps.SupportMapFragment"
+           android:id="@+id/users" />
+   </RelativeLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_levels"
+        android:id="@+id/chooseRadiusBtn"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="50dp"
+        android:onClick="showChooseRadius"
+        android:backgroundTint="@color/black"
+        android:layout_marginBottom="30dp"/>
+
+   <RelativeLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:gravity="center_horizontal"
+       android:layout_marginBottom="30dp"
+       android:layout_alignParentBottom="true">
+       <com.google.android.material.floatingactionbutton.FloatingActionButton
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:src="@drawable/arrow_forward"
+           app:fabCustomSize="80dp"
+           android:onClick="okClicked"
+           android:backgroundTint="@color/black"
+           />
+   </RelativeLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_soccer_ball_variant"
+        android:id="@+id/chooseGameBtn"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="50dp"
+        android:onClick="choseSports"
+        android:backgroundTint="@color/black"
+        android:layout_marginBottom="30dp"/>
 
 </RelativeLayout>

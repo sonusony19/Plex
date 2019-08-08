@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/popup_sports_background"
+    android:backgroundTint="@color/white">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/popup_sports_background"
+        android:padding="5dp">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/soccerBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp"
+            android:backgroundTint="@color/white"
+            android:src="@drawable/ic_soccer_ball_variant_black"
+            app:fabSize="mini" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/batmintonBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp"
+            android:layout_below="@id/soccerBtn"
+            android:backgroundTint="@color/white"
+            android:src="@drawable/ic_badminton"
+            app:fabSize="mini" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/swimmingBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/batmintonBtn"
+            android:layout_margin="2dp"
+            android:backgroundTint="@color/white"
+            android:src="@drawable/ic_swimming_silhouette"
+            app:fabSize="mini" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/poolBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/swimmingBtn"
+            android:layout_margin="2dp"
+            android:backgroundTint="@color/white"
+            android:src="@drawable/ic_eight_ball"
+            app:fabSize="mini" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/bowlingBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/poolBtn"
+            android:layout_margin="2dp"
+            android:layout_marginBottom="30dp"
+            android:backgroundTint="@color/white"
+            android:src="@drawable/ic_bowling"
+            app:fabSize="mini" />
+    </RelativeLayout>
+</RelativeLayout>

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProfileActivity">
+    tools:context=".ui.ProfileActivity">
 
     <include
         android:id="@+id/toolbar"
@@ -119,10 +119,22 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/useremail"
+                        android:id="@+id/game"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/Age"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginBottom="10dp"
+                        android:text="Game: "
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/useremail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/game"
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="15dp"
                         android:layout_marginBottom="10dp"

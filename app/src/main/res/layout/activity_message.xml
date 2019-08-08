@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorCream"
-    tools:context=".MessageActivity">
+    tools:context=".ui.MessageActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -58,6 +58,8 @@
             android:layout_centerVertical="true"
             android:paddingLeft="10dp"
             android:hint="Type a Message..."
+            android:maxLines="4"
+            android:inputType="textMultiLine"
             android:layout_toLeftOf="@+id/btn_send"
             android:backgroundTint="@color/white"
             android:layout_marginHorizontal="2dp"

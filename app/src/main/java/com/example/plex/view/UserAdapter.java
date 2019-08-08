@@ -11,8 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.plex.MainPage;
-import com.example.plex.MessageActivity;
+import com.example.plex.ui.MainPage;
+import com.example.plex.ui.MessageActivity;
 import com.example.plex.R;
 import com.example.plex.model.Chat;
 import com.example.plex.model.User;

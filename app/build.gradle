@@ -50,6 +50,9 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
     annotationProcessor "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
 
+    implementation 'com.xw.repo:bubbleseekbar:3.15-lite'
+    implementation 'com.polyak:icon-switch:1.0.0'
+
 }
 
 configurations.all {
