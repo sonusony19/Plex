@@ -61,21 +61,21 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.view.Gravity.RIGHT;
 
-public class AllUsers extends AppCompatActivity implements OnMapReadyCallback,InfoWindowSheet.BottomSheetListener{
+public class AllUsers extends AppCompatActivity implements OnMapReadyCallback, InfoWindowSheet.BottomSheetListener {
 
     private Toolbar toolbar;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private GoogleMap map;
-    private final int DEFAULT_ZOOM=15;
+    private final int DEFAULT_ZOOM = 1;
     private SupportMapFragment mapFragment;
     private Location mLastKnownLocation;
     private LocationCallback locationCallback;
-    private float defaultRadius=5,chosenRadius=-1;
+    private float defaultRadius = 5, chosenRadius = -1;
     private List<User> mUsers = readUsers();
     private Dialog dialog;
     private DatabaseReference reference;
     private PopupWindow popupWindow;
-    private FloatingActionButton chooseRadius,chooseSports;
+    private FloatingActionButton chooseRadius, chooseSports;
     private String game = "Soccer";
     private IconSwitch actionSwitch;
     private FirebaseUser firebaseUser;
@@ -87,7 +87,8 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback,In
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         chooseRadius = findViewById(R.id.chooseRadiusBtn);
-        actionSwitch  = findViewById(R.id.actionSwitch);
+        popupWindow = new PopupWindow(this);
+        actionSwitch = findViewById(R.id.actionSwitch);
         chooseSports = findViewById(R.id.chooseGameBtn);
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(AllUsers.this);
         getSupportActionBar().setTitle("Plex");
@@ -99,7 +100,7 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback,In
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(dialog!=null && dialog.isShowing()) dialog.dismiss();
+                if (dialog != null && dialog.isShowing()) dialog.dismiss();
                 startActivity(new Intent(AllUsers.this, MainPage.class));
                 finish();
 
@@ -107,40 +108,51 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback,In
         });
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                game = user.getGame();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
     }
 
     @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
         map = googleMap;
+        map.clear();
         map.setMyLocationEnabled(true);
         map.getUiSettings().setMyLocationButtonEnabled(true);
 
         LocationClass.getDeviceLocation(this);
-       new Handler().postDelayed(new Runnable() {
-           @Override
-           public void run() {
-               Location myLocation = LocationClass.getDeviceLocation(AllUsers.this);
-               map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(myLocation.getLatitude(),myLocation.getLongitude()), DEFAULT_ZOOM));
-               for(User user:mUsers) {
-                   String otherUserGame = user.getGame();
-                   LatLng userPosition = new LatLng(Double.parseDouble(user.getLatitude()),Double.parseDouble(user.getLongitude()));
-                   Location otherUser = new Location("OtherUser");
-                   otherUser.setLatitude(Double.parseDouble(user.getLatitude()));
-                   otherUser.setLongitude(Double.parseDouble(user.getLongitude()));
-                   float distance = myLocation.distanceTo(otherUser)/1000;
-                   if(chosenRadius==-1) defaultRadius=5;
-                   else defaultRadius = chosenRadius;
-                   if(distance<=defaultRadius&& game.equals(otherUserGame)){
-                       map.addMarker(
-                               new MarkerOptions().position(userPosition).title(user.getUserName()).icon(ImportantMethods.bitmapDescriptorFromVector(AllUsers.this,R.drawable.ic_account_circle_white_24dp)).snippet("Click here to know more"))
-                               .setTag(user);
-                   }
-               //map.moveCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 10F));
-               }
-           }
-       },3000);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Location myLocation = LocationClass.getDeviceLocation(AllUsers.this);
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()), DEFAULT_ZOOM));
+                for (User user : mUsers) {
+                    String otherUserGame = user.getGame();
+                    LatLng userPosition = new LatLng(Double.parseDouble(user.getLatitude()), Double.parseDouble(user.getLongitude()));
+                    Location otherUser = new Location("OtherUser");
+                    otherUser.setLatitude(Double.parseDouble(user.getLatitude()));
+                    otherUser.setLongitude(Double.parseDouble(user.getLongitude()));
+                    float distance = myLocation.distanceTo(otherUser) / 1000;
+                    if (chosenRadius == -1) defaultRadius = 5;
+                    else defaultRadius = chosenRadius;
+                    if (distance <= defaultRadius && game.equals(otherUserGame)) {
+                        map.addMarker(
+                                new MarkerOptions().position(userPosition).title(user.getUserName()).icon(ImportantMethods.bitmapDescriptorFromVector(AllUsers.this, R.drawable.ic_account_circle_white_24dp)).snippet("Click here to know more"))
+                                .setTag(user);
+                    }
+                    //map.moveCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 10F));
+                }
+            }
+        }, 3000);
 
 
 
@@ -177,7 +189,7 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback,In
 
         map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
-            public void onInfoWindowClick(Marker marker){
+            public void onInfoWindowClick(Marker marker) {
                 User user = (User) marker.getTag();
                 showAlertDialogue(user);
             }
@@ -235,7 +247,6 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback,In
     }
 
 
-
     private List<User> readUsers() {
         final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         final DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
@@ -245,13 +256,11 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback,In
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 mUsers.clear();
-                for(DataSnapshot snapshot: dataSnapshot.getChildren())
-                {
-                 User user = snapshot.getValue(User.class);
-                    assert user!=null;
-                    assert firebaseUser!=null;
-                    if(!user.getId().equals(firebaseUser.getUid()))
-                    {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    User user = snapshot.getValue(User.class);
+                    assert user != null;
+                    assert firebaseUser != null;
+                    if (!user.getId().equals(firebaseUser.getUid())) {
                         mUsers.add(user);
                     }
                 }
@@ -266,43 +275,51 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback,In
     }
 
 
-
     private void showAlertDialogue(final User user) {
 
-         dialog= new Dialog(this);
-         View view =getLayoutInflater().inflate(R.layout.infowindow_layout,null);
-         dialog.setContentView(view);
-         dialog.show();
-         Button cancel,chat,meet;
-         CircleImageView userImage;
-         TextView userName,userAge,userGame;
-         cancel = view.findViewById(R.id.btn_cancel);
-         chat = view.findViewById(R.id.btn_chat);
-         meet = view.findViewById(R.id.btn_meet);
+        dialog = new Dialog(this);
+        View view = getLayoutInflater().inflate(R.layout.infowindow_layout, null);
+        dialog.setContentView(view);
+        dialog.show();
+        Button cancel, chat, meet;
+        CircleImageView userImage;
+        TextView userName, userAge, userGame;
+        cancel = view.findViewById(R.id.btn_cancel);
+        chat = view.findViewById(R.id.btn_chat);
+        meet = view.findViewById(R.id.btn_meet);
 
-         userImage = view.findViewById(R.id.profile_image);
-         userAge = view.findViewById(R.id.userAgeInfoWIndow);
-         userName = view.findViewById(R.id.userNameInfoWIndow);
-         userGame = view.findViewById(R.id.userGameInfoWIndow);
+        userImage = view.findViewById(R.id.profile_image);
+        userAge = view.findViewById(R.id.userAgeInfoWIndow);
+        userName = view.findViewById(R.id.userNameInfoWIndow);
+        userGame = view.findViewById(R.id.userGameInfoWIndow);
 
 
-        userName.setText(userName.getText().toString()+user.getUserName());
-        userAge.setText(userAge.getText().toString()+user.getAge());
-        userGame.setText(userGame.getText().toString() +user.getGame());
-        if(user.getImageLink().equals("default"))
-        {
+        userName.setText(userName.getText().toString() + user.getUserName());
+        userAge.setText(userAge.getText().toString() + user.getAge());
+        userGame.setText(userGame.getText().toString() + user.getGame());
+        if (user.getImageLink().equals("default")) {
             userImage.setImageResource(R.drawable.user_icon);
-        }else
-        {
+        } else {
             Glide.with(getApplicationContext()).load(user.getImageLink()).into(userImage);
         }
 
-        cancel.setOnClickListener(new View.OnClickListener() {@Override public void onClick(View view) { dialog.dismiss(); }});
-        meet.setOnClickListener(new View.OnClickListener() {@Override public void onClick(View view) { }});
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+        meet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            }
+        });
         chat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(AllUsers.this, MessageActivity.class).putExtra("userid",user.getId())); }});
+                startActivity(new Intent(AllUsers.this, MessageActivity.class).putExtra("userid", user.getId()));
+            }
+        });
 
 
        /* InfoWindowSheet windowSheet = new InfoWindowSheet();
@@ -311,9 +328,9 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback,In
         windowSheet.updateWindow(user);*/
     }
 
-    private void status(String status){
+    private void status(String status) {
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("status",status);
+        hashMap.put("status", status);
         reference.updateChildren(hashMap);
     }
 
@@ -335,97 +352,107 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback,In
     }
 
     public void showChooseRadius(View view) {
-        popupWindow = new PopupWindow(this);
-        View v = getLayoutInflater().inflate(R.layout.choose_radius_layout, null);
-        popupWindow.setContentView(v);
-        popupWindow.showAtLocation(chooseRadius, Gravity.START|Gravity.BOTTOM, chooseRadius.getLeft(),chooseRadius.getHeight()+180);
-        final BubbleSeekBar seekBar = v.findViewById(R.id.chooseRadiusSeekBar);
-        FloatingActionButton dismissPopup = v.findViewById(R.id.dismissPopup);
-        seekBar.setProgress(defaultRadius);
-        seekBar.setOnProgressChangedListener(new BubbleSeekBar.OnProgressChangedListener() {
-            @Override
-            public void onProgressChanged(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat) {
-                chosenRadius = progressFloat;
-                defaultRadius = progressFloat;
-            }
+        if (popupWindow.isShowing()) popupWindow.dismiss();
+        else {
+            View v = getLayoutInflater().inflate(R.layout.choose_radius_layout, null);
+            popupWindow.setContentView(v);
+            popupWindow.showAtLocation(chooseRadius, Gravity.START | Gravity.BOTTOM, chooseRadius.getLeft(), chooseRadius.getHeight() + 180);
+            final BubbleSeekBar seekBar = v.findViewById(R.id.chooseRadiusSeekBar);
+            FloatingActionButton dismissPopup = v.findViewById(R.id.dismissPopup);
+            seekBar.setProgress(defaultRadius);
+            seekBar.setOnProgressChangedListener(new BubbleSeekBar.OnProgressChangedListener() {
+                @Override
+                public void onProgressChanged(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat) {
+                    chosenRadius = progressFloat;
+                    defaultRadius = progressFloat;
+                }
 
-            @Override
-            public void getProgressOnActionUp(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat) {
-                popupWindow.dismiss(); }
+                @Override
+                public void getProgressOnActionUp(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat) {
+                    popupWindow.dismiss();
+                }
 
-            @Override
-            public void getProgressOnFinally(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat) { }
-        });
+                @Override
+                public void getProgressOnFinally(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat) {
+                }
+            });
 
-        dismissPopup.setOnClickListener(new View.OnClickListener() {@Override public void onClick(View view) { popupWindow.dismiss(); }});
-
+            dismissPopup.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    popupWindow.dismiss();
+                }
+            });
+        }
     }
 
 
-
     public void choseSports(View view) {
-        popupWindow = new PopupWindow(this);
-        View v = getLayoutInflater().inflate(R.layout.choose_sports_layout, null);
-        popupWindow.setContentView(v);
-        popupWindow.showAtLocation(chooseSports, Gravity.BOTTOM|Gravity.LEFT, chooseSports.getRight()-chooseSports.getWidth(),chooseSports.getHeight()+150);
-        final FloatingActionButton badminton,swimming,pool,bowling,soccer;
-        badminton = v.findViewById(R.id.batmintonBtn);
-        swimming = v.findViewById(R.id.swimmingBtn);
-        pool = v.findViewById(R.id.poolBtn);
-        bowling = v.findViewById(R.id.bowlingBtn);
-        soccer = v.findViewById(R.id.soccerBtn);
-        badminton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                game = "Badminton";
-                updateGame(game);
-                chooseSports.setImageResource(R.drawable.ic_badminton_white);
-                popupWindow.dismiss();
-            }
-        });
-        pool.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                game = "Eight Ball Pool";
-                updateGame(game);
-                chooseSports.setImageResource(R.drawable.ic_eight_ball_white);
-                popupWindow.dismiss();
-            }
-        });
-        swimming.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                game = "Swimming";
-                updateGame(game);
-                chooseSports.setImageResource(R.drawable.ic_swimming_silhouette_white);
-                popupWindow.dismiss();
-            }
-        });
+        if (popupWindow.isShowing()) popupWindow.dismiss();
+        else {
 
-        soccer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                game = "Soccer";
-                updateGame(game);
-                chooseSports.setImageResource(R.drawable.ic_soccer_ball_variant);
-                popupWindow.dismiss();
-            }
-        });
-        bowling.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                game = "Bowling";
-                updateGame(game);
-                chooseSports.setImageResource(R.drawable.ic_soccer_ball_variant);
-                popupWindow.dismiss();
-            }
-        });
-        onMapReady(map);
+            View v = getLayoutInflater().inflate(R.layout.choose_sports_layout, null);
+            popupWindow.setContentView(v);
+            popupWindow.showAtLocation(chooseSports, Gravity.BOTTOM | Gravity.LEFT, chooseSports.getRight() - chooseSports.getWidth(), chooseSports.getHeight() + 150);
+            final FloatingActionButton badminton, swimming, pool, bowling, soccer;
+            badminton = v.findViewById(R.id.batmintonBtn);
+            swimming = v.findViewById(R.id.swimmingBtn);
+            pool = v.findViewById(R.id.poolBtn);
+            bowling = v.findViewById(R.id.bowlingBtn);
+            soccer = v.findViewById(R.id.soccerBtn);
+            badminton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    game = "Badminton";
+                    updateGame(game);
+                    chooseSports.setImageResource(R.drawable.ic_badminton_white);
+                    popupWindow.dismiss();
+                }
+            });
+            pool.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    game = "Eight Ball Pool";
+                    updateGame(game);
+                    chooseSports.setImageResource(R.drawable.ic_eight_ball_white);
+                    popupWindow.dismiss();
+                }
+            });
+            swimming.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    game = "Swimming";
+                    updateGame(game);
+                    chooseSports.setImageResource(R.drawable.ic_swimming_silhouette_white);
+                    popupWindow.dismiss();
+                }
+            });
+
+            soccer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    game = "Soccer";
+                    updateGame(game);
+                    chooseSports.setImageResource(R.drawable.ic_soccer_ball_variant);
+                    popupWindow.dismiss();
+                }
+            });
+            bowling.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    game = "Bowling";
+                    updateGame(game);
+                    chooseSports.setImageResource(R.drawable.ic_soccer_ball_variant);
+                    popupWindow.dismiss();
+                }
+            });
+        }
+
     }
 
     private void updateGame(String chosenGame) {
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("game",chosenGame);
+        hashMap.put("game", chosenGame);
         reference.updateChildren(hashMap);
     }
 
@@ -433,6 +460,8 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback,In
     public void okClicked(View view) {
         //write your code to sear for the places
         // my work is done
+        if(popupWindow.isShowing())popupWindow.dismiss();
+        onMapReady(map);
     }
 
 }

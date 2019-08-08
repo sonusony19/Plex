@@ -20,7 +20,7 @@
            app:bsb_bubble_color="@color/black"
            app:bsb_bubble_text_color="@color/white"
            app:bsb_second_track_color="@color/white"
-           app:bsb_max="50"
+           app:bsb_max="250000"
            app:bsb_min="1"
            android:id="@+id/chooseRadiusSeekBar"
            app:bsb_section_text_position="bottom_sides"

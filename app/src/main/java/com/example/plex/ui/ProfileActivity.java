@@ -326,9 +326,7 @@ public class ProfileActivity extends AppCompatActivity implements FillDetailsNav
 
     @Override
     protected void onDestroy() {
-        if(dialog.isShowing()){
-            dialog.dismiss();
-        }
+        if(dialog!=null && dialog.isShowing())dialog.dismiss();
         super.onDestroy();
     }
 }
