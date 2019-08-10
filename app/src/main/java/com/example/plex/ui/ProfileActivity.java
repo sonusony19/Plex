@@ -74,6 +74,7 @@ public class ProfileActivity extends AppCompatActivity implements FillDetailsNav
     private StorageReference storageReference;
     private ProgressDialog dialog;
     private FirebaseUser fUser;
+    private User mUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
@@ -102,6 +103,7 @@ public class ProfileActivity extends AppCompatActivity implements FillDetailsNav
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
+                mUser = user;
                 name.setText(name.getText().toString()+user.getUserName());
                 age.setText(age.getText().toString()+user.getAge());
                 email.setText(fUser.getEmail());
@@ -112,7 +114,7 @@ public class ProfileActivity extends AppCompatActivity implements FillDetailsNav
                     circleImageView.setImageResource(R.drawable.user_icon);
                 }else
                 {
-                    Glide.with(ProfileActivity.this).load(user.getImageLink()).into(circleImageView);
+                    Glide.with(getApplicationContext()).load(user.getImageLink()).into(circleImageView);
                 }
             }
 
@@ -284,7 +286,7 @@ public class ProfileActivity extends AppCompatActivity implements FillDetailsNav
     }
 
     public void saveBtnClicked(View view) {
-        updateUser();
+        updateUser(mUser);
         startActivity(new Intent(ProfileActivity.this, MainPage.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
         finish();
     }
@@ -297,13 +299,13 @@ public class ProfileActivity extends AppCompatActivity implements FillDetailsNav
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        updateUser();
+        updateUser(mUser);
         startActivity(new Intent(ProfileActivity.this,MainPage.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
         finish();
         return true;
     }
 
-    private void updateUser() {
+    private void updateUser(final User user) {
         LocationClass.getDeviceLocation(ProfileActivity.this);
         dialog = new ProgressDialog(this);
         dialog.setMessage("Saving");
@@ -314,7 +316,8 @@ public class ProfileActivity extends AppCompatActivity implements FillDetailsNav
                 Location mLocation = LocationClass.getDeviceLocation(ProfileActivity.this);
                 reference = FirebaseDatabase.getInstance().getReference("Users").child(fUser.getUid());
                 HashMap<String, Object> map = new HashMap<>();
-                map.put("imageLink",cloudUri);
+                if(cloudUri==null){ map.put("imageLink",user.getImageLink()); }
+                else{ map.put("imageLink",cloudUri); }
                 map.put("latitude",String.valueOf(mLocation.getLatitude()));
                 map.put("longitude",String.valueOf(mLocation.getLongitude()));
                 reference.updateChildren(map);
@@ -327,6 +330,8 @@ public class ProfileActivity extends AppCompatActivity implements FillDetailsNav
     @Override
     protected void onDestroy() {
         if(dialog!=null && dialog.isShowing())dialog.dismiss();
+
         super.onDestroy();
     }
+
 }

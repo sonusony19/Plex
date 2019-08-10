@@ -71,6 +71,9 @@ public class RegisterActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,spinnerContent);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+        ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,gameContent);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        gameSpinner.setAdapter(adapter1);
         progressBar=findViewById(R.id.progressbar);
         auth = FirebaseAuth.getInstance();
         toolbar = findViewById(R.id.toolbar);
@@ -90,9 +93,9 @@ public class RegisterActivity extends AppCompatActivity {
             userData.putString("name",name.getText().toString().trim());
             userData.putString("email",email.getText().toString().trim());
             userData.putString("age",age.getText().toString().trim());
+            userData.putString("game",gameSpinner.getSelectedItem().toString());
             userData.putString("sex",spinner.getSelectedItem().toString());
             userData.putString("pass",password.getText().toString().trim());
-            userData.putString("game",gameSpinner.getSelectedItem().toString());
             registerUser(userData);
         }
     }
@@ -117,6 +120,7 @@ public class RegisterActivity extends AppCompatActivity {
                     values.put("age",userData.getString("age"));
                     values.put("sex",userData.getString("sex"));
                     values.put("imageLink","default");
+                    values.put("game",userData.getString("game"));
                     values.put("status","offline");
                     values.put("latitude","0.00000");
                     values.put("longitude","0.00000");

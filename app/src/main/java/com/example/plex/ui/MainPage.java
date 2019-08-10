@@ -1,5 +1,6 @@
 package com.example.plex.ui;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -15,6 +16,8 @@ import androidx.annotation.NonNull;
 
 import android.view.MenuItem;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -23,6 +26,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,6 +34,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.Menu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,12 +62,6 @@ public class MainPage extends AppCompatActivity {
         getSupportActionBar().setTitle("");
         userName = findViewById(R.id.usernametag);
         imageView = findViewById(R.id.profile_image);
-      /*  DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-        navigationView.setNavigationItemSelectedListener(this);*/
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         reference= FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
 
@@ -117,37 +116,37 @@ public class MainPage extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) { }
         });
 
-      //  inflateNavigtionDrawerHeader();
+
     }
 
-   /* private void inflateNavigtionDrawerHeader() {
 
-        DatabaseReference tempRef = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
-        tempRef.addValueEventListener(new ValueEventListener() {
+    private void showVarificationDialog(int selection) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final Intent intent = new Intent(this,LoginActivity.class);
+        builder.setTitle("Varify Email");
+        if(selection==2)
+        builder.setMessage("Email is not varified, Check your inbox of registered email for verification to use this App");
+        else if(selection==1)
+            builder.setMessage("Email is not Correct, Can't send varification email");
+        builder.setPositiveButton("Exit", new DialogInterface.OnClickListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-               if(user==null){
-                   Toast.makeText(getApplicationContext(),"user not found",Toast.LENGTH_LONG).show();
-               }
-                name.setText(user.getUserName());
-                email.setText(firebaseUser.getEmail());
-                if(user.getImageLink().equals("default"))
-                {
-
-                    userImage.setImageResource(R.drawable.user_icon);
-                }else
-                {
-                    Glide.with(MainPage.this).load(user.getImageLink()).into(userImage);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
+            public void onClick(DialogInterface dialogInterface, int i) {
+           dialogInterface.dismiss();
+           finish();
             }
         });
-    }*/
+        builder.setNegativeButton("Logout", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+           FirebaseAuth.getInstance().signOut();
+           dialogInterface.dismiss();
+                startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                finish();
+            }
+        });
+        builder.show();
+    }
+
 
     private void readChats() {
 
@@ -178,16 +177,6 @@ public class MainPage extends AppCompatActivity {
     }
 
 
-    /*@Override
-    public void onBackPressed() {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }*/
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.mainpage_menu,menu);
@@ -198,7 +187,7 @@ public class MainPage extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.profilemenu:
-                startActivity(new Intent(this, ProfileActivity.class));
+                startActivity(new Intent(this, ProfileActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 break;
             case R.id.logoutmenu:
                 FirebaseAuth.getInstance().signOut();
@@ -212,27 +201,6 @@ public class MainPage extends AppCompatActivity {
     public void showAllUsers(View view) {
         startActivity(new Intent(this, AllUsers.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
-/*
-
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        item.setCheckable(false);
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-
-        switch (item.getItemId()){
-            case R.id.profilemenu:
-                startActivity(new Intent(this,ProfileActivity.class));
-                break;
-            case R.id.logoutmenu:
-                FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(this,LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
-                finish();
-                break;
-        }
-        return true;
-    }
-*/
 
 
     private void status(String status){
@@ -245,6 +213,22 @@ public class MainPage extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if(!firebaseUser.isEmailVerified()){
+            firebaseUser.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(!task.isSuccessful()){
+                        Toast.makeText(getApplicationContext(),"Couldn't send varification email",Toast.LENGTH_LONG).show();
+                        showVarificationDialog(1);
+                    }
+                    else
+                    {
+                        showVarificationDialog(2);
+                    }
+                }
+            });
+
+        }
         status("online");
     }
 
@@ -254,11 +238,6 @@ public class MainPage extends AppCompatActivity {
         status("offline");
     }
 
-    @Override
-    public boolean isDestroyed() {
-        status("offline");
-        return super.isDestroyed();
-    }
 
     @Override
     public void onBackPressed() {

@@ -1,10 +1,12 @@
 package com.example.plex.ui;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -105,10 +107,29 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
         user = FirebaseAuth.getInstance().getCurrentUser();
         user = auth.getCurrentUser();
-        if (user != null) {
+
+        if(user!=null){
             startActivity(new Intent(LoginActivity.this, MainPage.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             finish();
         }
+    }
+
+    private void showVarificationDialog(int selection) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final Intent intent = new Intent(this,LoginActivity.class);
+        builder.setTitle("Varify Email");
+        if(selection==2)
+            builder.setMessage("Email is not varified, Check your inbox of registered email for verification to use this App");
+        else if(selection==1)
+            builder.setMessage("Email is not Correct, Can't send varification email");
+        builder.setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+                finish();
+            }
+        });
+        builder.show();
     }
 
     private void methodSignin(String semail, String spassword) {

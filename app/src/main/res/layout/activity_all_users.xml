@@ -6,14 +6,22 @@
     android:backgroundTint="@color/white"
     android:layout_height="match_parent"
     tools:context=".ui.AllUsers">
-    <include layout="@layout/bar_layout"
-        android:id="@+id/toolbar"/>
+
+
+   <RelativeLayout
+       android:layout_width="match_parent"
+       android:layout_height="match_parent">
+       <fragment
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:name="com.google.android.gms.maps.SupportMapFragment"
+           android:id="@+id/users" />
+   </RelativeLayout>
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="8dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
         android:padding="2dp"
         android:background="@drawable/popup_sports_background"
         android:gravity="right"
@@ -21,7 +29,7 @@
         <com.polyak.iconswitch.IconSwitch
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
+            android:layout_margin="5dp"
             android:id="@+id/actionSwitch"
             app:isw_default_selection="right"
             app:isw_thumb_color_left="@color/black"
@@ -38,18 +46,6 @@
 
         </com.polyak.iconswitch.IconSwitch>
     </RelativeLayout>
-
-
-   <RelativeLayout
-       android:layout_below="@id/toolbar"
-       android:layout_width="match_parent"
-       android:layout_height="match_parent">
-       <fragment
-           android:layout_width="match_parent"
-           android:layout_height="match_parent"
-           android:name="com.google.android.gms.maps.SupportMapFragment"
-           android:id="@+id/users" />
-   </RelativeLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:layout_width="wrap_content"

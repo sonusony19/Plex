@@ -63,10 +63,9 @@ import static android.view.Gravity.RIGHT;
 
 public class AllUsers extends AppCompatActivity implements OnMapReadyCallback, InfoWindowSheet.BottomSheetListener {
 
-    private Toolbar toolbar;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private GoogleMap map;
-    private final int DEFAULT_ZOOM = 1;
+    private final int DEFAULT_ZOOM = 15;
     private SupportMapFragment mapFragment;
     private Location mLastKnownLocation;
     private LocationCallback locationCallback;
@@ -84,28 +83,16 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback, I
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_all_users);
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         chooseRadius = findViewById(R.id.chooseRadiusBtn);
         popupWindow = new PopupWindow(this);
         actionSwitch = findViewById(R.id.actionSwitch);
         chooseSports = findViewById(R.id.chooseGameBtn);
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(AllUsers.this);
-        getSupportActionBar().setTitle("Plex");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.users);
         mapFragment.getMapAsync(this);
         readUsers();
 
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (dialog != null && dialog.isShowing()) dialog.dismiss();
-                startActivity(new Intent(AllUsers.this, MainPage.class));
-                finish();
 
-            }
-        });
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
         reference.addValueEventListener(new ValueEventListener() {

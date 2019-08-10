@@ -36,7 +36,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:18.0.0'
     implementation 'com.google.firebase:firebase-database:18.0.0'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
-    implementation 'com.github.bumptech.glide:glide:4.8.0'
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0-beta01'
     implementation 'com.github.silvestrpredko:dot-progress-bar:1.1'
     implementation 'com.google.firebase:firebase-storage:18.0.0'
@@ -52,6 +52,7 @@ dependencies {
 
     implementation 'com.xw.repo:bubbleseekbar:3.15-lite'
     implementation 'com.polyak:icon-switch:1.0.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
 
 }
 

@@ -16,8 +16,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.MessageActivity"
-            android:parentActivityName=".ui.MainPage"></activity>
+        <activity
+            android:name=".ui.MessageActivity"
+            android:parentActivityName=".ui.MainPage" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -28,15 +29,13 @@
             android:parentActivityName=".ui.MainPage" />
         <activity
             android:name=".ui.MainPage"
-            android:label="@string/title_activity_main_page"
-             />
+            android:label="@string/title_activity_main_page" />
         <activity
             android:name=".ui.ProfileActivity"
             android:parentActivityName=".ui.MainPage" />
         <activity
             android:name=".ui.RegisterActivity"
             android:parentActivityName=".ui.LoginActivity" />
-
         <activity android:name=".ui.ResetPasswordActivity" />
         <activity android:name=".ui.LoginActivity" />
         <activity android:name=".ui.SplashActivity">
@@ -47,7 +46,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.StartActivity" />
-        <activity android:name=".ui.FillDetails"></activity>
+        <activity android:name=".ui.FillDetails" />
     </application>
 
 </manifest>
