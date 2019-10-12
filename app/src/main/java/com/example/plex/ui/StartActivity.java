@@ -33,7 +33,7 @@ public class StartActivity extends AppCompatActivity {
         setContentView(R.layout.activity_start);
 
         if((ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-            && (ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)==PackageManager.PERMISSION_GRANTED))
+                && (ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)==PackageManager.PERMISSION_GRANTED))
         {
             moveFurther();
         }
@@ -48,7 +48,7 @@ public class StartActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if(ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        && ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)==PackageManager.PERMISSION_GRANTED)
+                && ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)==PackageManager.PERMISSION_GRANTED)
         {
             moveFurther();
         }
@@ -58,7 +58,7 @@ public class StartActivity extends AppCompatActivity {
 
         Dexter.withActivity(StartActivity.this)
                 .withPermissions(Manifest.permission.ACCESS_FINE_LOCATION
-                ,Manifest.permission.ACCESS_COARSE_LOCATION)
+                        ,Manifest.permission.ACCESS_COARSE_LOCATION)
                 .withListener(new MultiplePermissionsListener() {
                     @Override
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
@@ -93,7 +93,7 @@ public class StartActivity extends AppCompatActivity {
             }
         }).onSameThread().check();
 
-        }
+    }
 
 
 }

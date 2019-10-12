@@ -247,8 +247,10 @@ public class AllUsers extends AppCompatActivity implements OnMapReadyCallback, I
                     User user = snapshot.getValue(User.class);
                     assert user != null;
                     assert firebaseUser != null;
-                    if (!user.getId().equals(firebaseUser.getUid())) {
-                        mUsers.add(user);
+                    if(ImportantMethods.securityCheckPasses(user)){
+                        if (!user.getId().equals(firebaseUser.getUid())) {
+                            mUsers.add(user);
+                        }
                     }
                 }
             }

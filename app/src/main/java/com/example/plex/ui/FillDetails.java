@@ -280,7 +280,7 @@ public class FillDetails extends AppCompatActivity implements FillDetailsNavigat
         finish();
     }
 
-   @Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.my_menu,menu);
         return true;
@@ -303,7 +303,7 @@ public class FillDetails extends AppCompatActivity implements FillDetailsNavigat
             @Override
             public void run() {
                 Location mLocation = LocationClass.getDeviceLocation(FillDetails.this);
-                               reference = FirebaseDatabase.getInstance().getReference("Users").child(fUser.getUid());
+                reference = FirebaseDatabase.getInstance().getReference("Users").child(fUser.getUid());
                 HashMap<String, Object> map = new HashMap<>();
                 if(cloudUri==null){ map.put("imageLink",user.getImageLink()); }
                 else map.put("imageLink",cloudUri);

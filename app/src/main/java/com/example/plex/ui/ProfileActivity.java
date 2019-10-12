@@ -104,17 +104,19 @@ public class ProfileActivity extends AppCompatActivity implements FillDetailsNav
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
                 mUser = user;
-                name.setText(name.getText().toString()+user.getUserName());
-                age.setText(age.getText().toString()+user.getAge());
-                email.setText(fUser.getEmail());
-                game.setText(game.getText().toString()+user.getGame());
-                if(user.getImageLink().equals("default"))
-                {
-                    imageUri = "default";
-                    circleImageView.setImageResource(R.drawable.user_icon);
-                }else
-                {
-                    Glide.with(getApplicationContext()).load(user.getImageLink()).into(circleImageView);
+                if(ImportantMethods.securityCheckPasses(mUser)){
+                    name.setText(name.getText().toString()+user.getUserName());
+                    age.setText(age.getText().toString()+user.getAge());
+                    email.setText(fUser.getEmail());
+                    game.setText(game.getText().toString()+user.getGame());
+                    if(user.getImageLink().equals("default"))
+                    {
+                        imageUri = "default";
+                        circleImageView.setImageResource(R.drawable.user_icon);
+                    }else
+                    {
+                        Glide.with(getApplicationContext()).load(user.getImageLink()).into(circleImageView);
+                    }
                 }
             }
 

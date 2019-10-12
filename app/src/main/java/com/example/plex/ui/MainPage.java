@@ -75,7 +75,7 @@ public class MainPage extends AppCompatActivity {
                     imageView.setImageResource(R.drawable.user_icon);
                 }else
                 {
-                        Glide.with(getApplicationContext()).load(user.getImageLink()).into(imageView);
+                    Glide.with(getApplicationContext()).load(user.getImageLink()).into(imageView);
                 }
 
 
@@ -125,21 +125,21 @@ public class MainPage extends AppCompatActivity {
         final Intent intent = new Intent(this,LoginActivity.class);
         builder.setTitle("Varify Email");
         if(selection==2)
-        builder.setMessage("Email is not varified, Check your inbox of registered email for verification to use this App");
+            builder.setMessage("Email is not varified, Check your inbox of registered email for verification to use this App");
         else if(selection==1)
             builder.setMessage("Email is not Correct, Can't send varification email");
         builder.setPositiveButton("Exit", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-           dialogInterface.dismiss();
-           finish();
+                dialogInterface.dismiss();
+                finish();
             }
         });
         builder.setNegativeButton("Logout", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-           FirebaseAuth.getInstance().signOut();
-           dialogInterface.dismiss();
+                FirebaseAuth.getInstance().signOut();
+                dialogInterface.dismiss();
                 startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
                 finish();
             }

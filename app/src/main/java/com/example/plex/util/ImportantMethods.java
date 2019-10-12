@@ -15,6 +15,7 @@ import androidx.annotation.DrawableRes;
 import androidx.core.content.ContextCompat;
 
 import com.example.plex.R;
+import com.example.plex.model.User;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
@@ -54,5 +55,14 @@ public class ImportantMethods {
         background.draw(canvas);
         vectorDrawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+    public static boolean securityCheckPasses(User user) {
+        boolean passes = true;
+        if(user.getId()==null || user.getAge()==null || user.getGame()==null || user.getImageLink()==null || user.getLatitude()==null
+                || user.getStatus()==null || user.getLongitude()==null || user.getUserName()==null || user.getSex()==null){
+            passes = false;
+        }
+        return passes;
     }
 }
